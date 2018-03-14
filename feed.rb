@@ -7,6 +7,7 @@ require 'open-uri'
 require 'feedparser'
 
 require 'discordrb'
+require 'discordrb/api'
 require 'discordrb/webhooks'
 
 # Configuration
@@ -29,8 +30,6 @@ Signal.trap("INT") {
   $runFeeds = false
   $feedThread.wakeup
 }
-
-webhook = Discordrb::Webhooks::Client.new(url: WebhookURL)
 
 $feedThread = Thread.new {
 
@@ -65,26 +64,26 @@ $feedThread = Thread.new {
       
       puts "Sending item to discord: " + formatted
 
-      response = webhook.execute{|builder|
+      # This is a hacky way to follow the rate limiting
+      builder = Discordrb::Webhooks::Builder.new
 
-        builder.content = formatted
-        if CustomUserName
-          builder.username = CustomUserName
-        end
-      }
+      builder.content = formatted
+      if CustomUserName
+        builder.username = CustomUserName
+      end
+
+      # Send it
+      # could append ?wait=true to the url
+      response = Discordrb::API::request(:webhook, WebhookMajorParameter, "post", WebhookURL,
+                                         builder.to_json_hash.to_json, content_type: :json)
 
       puts "Got response: #{response.code}"
 
-      if response.code != 200
+      if response.code != 200 && response.code != 204
         
         # Failed
         puts "Request failed. Not marking as done"
 
-        if response.code == 429
-          puts "We got response 429. Waiting a bit"
-          sleep 30
-        end
-        
       else
         # Mark item as done
         puts "Marking item as done"
