@@ -76,12 +76,14 @@ end
 
 def checkHasPostBeenSent(id)
 
-  result = $dbConnection.exec_params("SELECT 1 FROM seenposts WHERE id = $1;", [id])
+  result = $dbConnection.exec_params("SELECT 1 FROM seenposts WHERE id = $1 and sent = true;",
+                                     [id])
   return result.ntuples == 1
 end
 
 def setPostAsSent(id, url = nil)
-  $dbConnection.exec_params("INSERT INTO seenposts (id, sent, url) VALUES ($1, true, $2);",
+  $dbConnection.exec_params("INSERT INTO seenposts (id, sent, url) VALUES ($1, true, $2) " +
+                            "ON CONFLICT (id) DO UPDATE SET sent = true, url = $2;",
                             [id, url])
 end
 
