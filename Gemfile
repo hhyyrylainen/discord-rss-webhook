@@ -4,3 +4,4 @@ source "https://rubygems.org"
 gem 'pg'
 gem 'feedparser'
 gem 'discordrb'
+gem 'json'
