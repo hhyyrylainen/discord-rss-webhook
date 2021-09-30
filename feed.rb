@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # Main file of this project
 # Written by Henri Hyyryläinen
 require 'logger'
@@ -37,7 +36,7 @@ $feedThread = Thread.new do
     puts 'Fetching feeds...'
 
     Feeds.each do |feedInfo|
-      feedParser = FeedParser::Parser.parse(open(feedInfo).read)
+      feedParser = FeedParser::Parser.parse(URI.parse(feedInfo).open.read)
       items += feedParser.items
     end
 
