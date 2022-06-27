@@ -1,4 +1,8 @@
 # discord-rss-webhook
+
+**OBSOLETE** this functionality is now in https://github.com/Revolutionary-Games/ThriveDevCenter
+
+
 Reads RSS feeds and posts them to a discord webhook
 
 Database setup
